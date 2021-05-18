@@ -14,13 +14,14 @@ class VrPlayer extends React.Component {
             position: 0,
             sources: []
         };
+		this.videoRef = React.createRef();
     }
 
     render() {
         return (
             <div className="VrPlayer">
 
-                <Video  ref="video"
+                <Video  ref={this.videoRef}
                         sources={this.state.sources}
                         onFullScreen={this.fullScreen.bind(this)}
                         onPositionChange={ p => this.setState({position: p}) }
@@ -51,7 +52,7 @@ class VrPlayer extends React.Component {
     }
 
     togglePlayPause() {
-        this.refs.video.playPause();
+        this.videoRef.playPause();
     }
 
     mute(muted) {
@@ -59,7 +60,7 @@ class VrPlayer extends React.Component {
     }
 
     toggleMute() {
-        this.refs.video.toggleMute();
+        this.videoRef.toggleMute();
     }
 
     fullScreen(isFullscreen) {
@@ -67,11 +68,11 @@ class VrPlayer extends React.Component {
     }
 
     toggleFullScreen() {
-        this.refs.video.goFullScreen();
+        this.videoRef.goFullScreen();
     }
 
     changePosition(percentage) {
-        this.refs.video.setPosition(percentage);
+        this.videoRef.setPosition(percentage);
     }
 
     localVideoSelected(videoSource){
@@ -79,7 +80,7 @@ class VrPlayer extends React.Component {
     }
 
     zeroSensor() {
-        this.refs.video.zeroSensor();
+        this.videoRef.zeroSensor();
     }
 
     componentWillMount() {
