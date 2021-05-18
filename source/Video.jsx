@@ -18,15 +18,17 @@ class Video extends React.Component {
             devices: null,
             needReload: false
         };
+		this.videoRef = React.createRef();
+		this.canvasRef = React.createRef();
     }
 
     render() {
         return (
             <div>
-                <canvas className="glcanvas" ref="canvas">
+                <canvas className="glcanvas" ref={this.canvasRef}>
                     Your browser doesn't appear to support the HTML5 <code>&lt;canvas&gt;</code> element.
                 </canvas>
-                <video preload="false" className="video" loop="true" webkit-playsinline ref="video" style={{height: 200}}>
+                <video preload="false" className="video" loop="true" webkit-playsinline ref={this.videoRef} style={{height: 200}}>
                     { this.props.sources.map(s => <source src={s.url} type={s.type} key={s.url} />)}
                 </video>
             </div>
@@ -48,7 +50,7 @@ class Video extends React.Component {
                 this.setState({devices});
             })
             .then(() => {
-                return getWebGl(devices, phone, this.refs.video, this.refs.canvas);
+                return getWebGl(devices, phone, this.videoRef, this.canvasRef);
             })
             .then(gl => {
                 this.setState({webGl: gl});
@@ -57,7 +59,7 @@ class Video extends React.Component {
                 });
             });
 
-        const video = this.refs.video;
+        const video = this.videoRef;
 
         video.addEventListener('timeupdate', () => {
             if (!video.paused) {
@@ -72,7 +74,7 @@ class Video extends React.Component {
         });
 
         document.addEventListener('fullscreenchange', function(event) {
-            if (this.props.isFullscreen !== document.fullscreenEnabled && document.fullScreenElement === this.refs.canvas){
+            if (this.props.isFullscreen !== document.fullscreenEnabled && document.fullScreenElement === this.canvasRef){
                 this.props.onFullscreen(document.fullscreenEnabled);
             }
         });
@@ -87,7 +89,7 @@ class Video extends React.Component {
     componentDidUpdate(){
         if (this.state.needReload){
             console.log('Reloading video');
-            const video = this.refs.video;
+            const video = this.videoRef;
             const webGl = this.state.webGl;
             video.load();
             webGl.draw();
@@ -103,7 +105,7 @@ class Video extends React.Component {
     }
 
     playPause() {
-        const video = this.refs.video;
+        const video = this.videoRef;
         const webGl = this.state.webGl;
         if (video.paused) {
             video.play();
@@ -115,19 +117,19 @@ class Video extends React.Component {
     }
 
     toggleMute() {
-        const video = this.refs.video;
+        const video = this.videoRef;
         video.muted = !video.muted;
         this.props.onMute(video.muted);
     }
 
     goFullScreen() {
-        const canvas = this.refs.canvas;
+        const canvas = this.canvasRef;
         const devices = this.state.devices;
         goFullScreen(canvas, devices, true);
     }
 
     setPosition(percentage) {
-        const video = this.refs.video;
+        const video = this.videoRef;
         const time = video.duration * percentage / 100;
         video.currentTime = time;
         this.props.onPositionChange(percentage);
@@ -141,7 +143,7 @@ class Video extends React.Component {
     }
 
     updateSources () {
-        const video = this.refs.video;
+        const video = this.videoRef;
         const webGl = this.state.webGl;
         video.pause();
         webGl.stop();
